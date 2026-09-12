@@ -40,7 +40,7 @@ State.__index = State
 --- @return _99sync.StateProps
 local function create()
   return {
-    model = "opencode/claude-fable-5-1",
+    model = "opencode/big-pickle",
     md_files = {},
     ai_stdout_rows = 3,
     display_errors = false,

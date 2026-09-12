@@ -437,6 +437,31 @@ function _99sync.setup(opts)
     if provider._get_default_model then
       _99sync_state.model = provider._get_default_model()
     end
+    -- The hardcoded default may not exist in the user's CLI (models change).
+    -- If the provider can list models and ours is missing, fall back to the
+    -- first available one so the first request works without manual picking.
+    if provider.fetch_models then
+      local state_ref = _99sync_state
+      pcall(function()
+        provider.fetch_models(function(models, _err)
+          vim.schedule(function()
+            if _99sync_state == nil or _99sync_state ~= state_ref then
+              return
+            end
+            if type(models) ~= "table" or #models == 0 then
+              return
+            end
+            for _, m in ipairs(models) do
+              if m == state_ref.model then
+                return
+              end
+            end
+            state_ref.model = models[1]
+            vim.notify("99sync: default model not available, using " .. models[1])
+          end)
+        end)
+      end)
+    end
   end
 
   if opts.provider_extra_args then

@@ -77,6 +77,7 @@ function BaseProvider:make_request(query, context, observer)
   end
   logger:debug("make_request", "command", command)
 
+  local stderr_chunks = {}
   local proc = vim.system(
     command,
     {
@@ -104,6 +105,9 @@ function BaseProvider:make_request(query, context, observer)
           logger:debug("stderr#error", "err", err)
         end
         if not err then
+          if data and data ~= "" then
+            table.insert(stderr_chunks, data)
+          end
           observer.on_stderr(data)
         end
       end),
@@ -115,8 +119,16 @@ function BaseProvider:make_request(query, context, observer)
         return
       end
       if obj.code ~= 0 then
-        local str =
-          string.format("process exit code: %d\n%s", obj.code, vim.inspect(obj))
+        local stderr_tail = table.concat(stderr_chunks, "")
+        if #stderr_tail > 2000 then
+          stderr_tail = "..." .. stderr_tail:sub(-2000)
+        end
+        local str = string.format(
+          "process exit code: %d\n%s\nstderr:\n%s",
+          obj.code,
+          vim.inspect(obj),
+          stderr_tail
+        )
         once_complete("failed", str)
         logger:fatal(
           self:_get_provider_name() .. " make_query failed: " .. str,
@@ -167,7 +179,7 @@ end
 
 --- @return string
 function OpenCodeProvider._get_default_model()
-  return "opencode/claude-fable-5-1"
+  return "opencode/big-pickle"
 end
 
 function OpenCodeProvider.fetch_models(callback)

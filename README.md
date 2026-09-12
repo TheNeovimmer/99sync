@@ -399,7 +399,7 @@ Works out of the box with `source = "native"`. For `nvim-cmp` set `source = "cmp
 
 | Provider | CLI tool | Default model |
 |---|---|---|
-| `OpenCodeProvider` (default) | `opencode` | `opencode/claude-fable-5-1` |
+| `OpenCodeProvider` (default) | `opencode` | `opencode/big-pickle` |
 | `ClaudeCodeProvider` | `claude` | `claude-fable-5-1` |
 | `CursorAgentProvider` | `cursor-agent` | `grok-4.6` |
 | `KiroProvider` | `kiro-cli` | `claude-fable-5-1` |

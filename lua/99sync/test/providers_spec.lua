@@ -21,7 +21,7 @@ describe("providers", function()
 
     it("has correct default model", function()
       eq(
-        "opencode/claude-fable-5-1",
+        "opencode/big-pickle",
         Providers.OpenCodeProvider._get_default_model()
       )
     end)
@@ -105,7 +105,7 @@ describe("providers", function()
 
         _99sync.setup({})
         local state = _99sync.__get_state()
-        eq("opencode/claude-fable-5-1", state.model)
+        eq("opencode/big-pickle", state.model)
       end
     )
 
