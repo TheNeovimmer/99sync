@@ -1,0 +1,42 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  format:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --check lua/ --config-path=.stylua.toml
+
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: 99sync
+      - name: Install Neovim
+        run: |
+          curl -sL https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz | tar xz -C /tmp
+          echo /tmp/nvim-linux-x86_64/bin >> "$GITHUB_PATH"
+      - name: Install plenary.nvim
+        run: git clone --depth=1 https://github.com/nvim-lua/plenary.nvim plenary.nvim
+      - name: Install luacheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq luarocks
+          sudo luarocks install luacheck
+      - name: Lint
+        working-directory: 99sync
+        run: make lua_lint
+      - name: Test
+        working-directory: 99sync
+        run: make lua_test

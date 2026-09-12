@@ -178,8 +178,13 @@ Switching provider resets the model to that provider default for the session.
 
 ## Troubleshooting and bug reports
 
-1. Repro with debug logging on (`logger.level = _99sync.DEBUG`).
-2. Run `:lua require("99sync").view_logs()`, pick the failing request.
-3. Open an issue at `TheNeovimmer/99sync` with: what you ran, expected vs actual, backend (`opencode --version` etc.), model, and redacted logs (strip secrets/`query` if needed).
+1. Run `:checkhealth 99sync` and fix anything it flags (missing CLI, bad model, unwritable `tmp_dir`).
+2. Repro with debug logging on (`logger.level = _99sync.DEBUG`).
+3. Run `:lua require("99sync").view_logs()`, pick the failing request.
+4. Open an issue at `TheNeovimmer/99sync` with: what you ran, expected vs actual, backend (`opencode --version` etc.), model, and redacted logs (strip secrets/`query` if needed).
 
 `stop_all_requests()` kills the underlying CLI process; the result is discarded. `clear_previous_requests()` clears history.
+
+## License
+
+MIT — see [LICENSE](./LICENSE).
