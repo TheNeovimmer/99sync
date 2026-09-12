@@ -197,76 +197,6 @@ input capture of work description will be required
 will use _99sync.search to find what is left to be done for this work item to be
 considered done
 
-## _99sync.Options
-No description.
-
-### Description
-| Name | Type | Default Value |
-| --- | --- | --- |
-| `logger` | `_99sync.Logger.Options \| nil` | - |
-| `model` | `string \| nil` | - |
-| `in_flight_options` | `_99sync.StatusWindow.Opts \| nil` | - |
-| `md_files` | `string[] \| nil` | - |
-| `provider` | `_99sync.Providers.BaseProvider \| nil` | - |
-| `provider_extra_args` | `string[] \| nil` | - |
-| `display_errors` | `boolean \| nil` | - |
-| `auto_add_skills` | `boolean \| nil` | - |
-| `completion` | `_99sync.Completion \| nil` | - |
-| `tmp_dir` | `string \| nil` | - |
-
-### API
-
-#### logger
-No description.
-
-#### model
-No description.
-
-#### in_flight_options
-No description.
-
-#### md_files
-No description.
-
-#### provider
-No description.
-
-#### provider_extra_args
-No description.
-
-#### display_errors
-No description.
-
-#### auto_add_skills
-No description.
-
-#### completion
-No description.
-
-#### tmp_dir
-No description.
-
-## _99sync.State.Tracking
-No description.
-
-### Description
-| Name | Type | Default Value |
-| --- | --- | --- |
-| `history` | `_99sync.Prompt[]` | - |
-| `id_to_request` | `table<number, _99sync.Prompt>` | - |
-| `setup` | `fun(opts: _99sync.State.Tracking.Config.Options): nil` | - |
-
-### API
-
-#### history
-No description.
-
-#### id_to_request
-No description.
-
-#### setup
-No description.
-
 ## _99sync.ops.Opts
 The options that are used throughout all the interations with 99sync.  This
 includes search, visual, and others
@@ -313,70 +243,6 @@ There are no properties yet.  But i would like to tweek some behavior based on o
 | - | - | - |
 
 ### API
-No properties.
-
-## _99sync.WorkOpts
-No description.
-
-### Description
-| Name | Type | Default Value |
-| --- | --- | --- |
-| `description` | `string \| nil` | - |
-
-### API
-
-#### description
-No description.
-
-## _99sync.Completion
-No description.
-
-### Description
-| Name | Type | Default Value |
-| --- | --- | --- |
-| `source` | `"cmp" \| "blink" \| nil` | - |
-| `custom_rules` | `string[]` | - |
-| `files` | `_99sync.Files.Config?` | - |
-
-### API
-
-#### source
-No description.
-
-#### custom_rules
-No description.
-
-#### files
-No description.
-
-## _99sync.Logger.Options
-No description.
-
-### Description
-| Name | Type | Default Value |
-| --- | --- | --- |
-| `level` | `number?` | - |
-| `type` | `"print" \| "void" \| "file" \| nil` | - |
-| `path` | `string?` | - |
-| `print_on_error` | `boolean \| nil` | - |
-| `max_requests_cached` | `number \| nil` | - |
-
-### API
-
-#### level
-No description.
-
-#### type
-No description.
-
-#### path
-No description.
-
-#### print_on_error
-No description.
-
-#### max_requests_cached
-No description.
 
 ## _99sync.StatusWindow.Opts
 this is pure a class for testing.   helps controls timings
@@ -399,24 +265,3 @@ displayed / removed
 
 #### enable
 defaults to true
-
-## _99sync.Agents.Rule
-No description.
-
-### Description
-| Name | Type | Default Value |
-| --- | --- | --- |
-| `name` | `string` | - |
-| `path` | `string` | - |
-| `absolute_path` | `string?` | - |
-
-### API
-
-#### name
-No description.
-
-#### path
-No description.
-
-#### absolute_path
-No description.

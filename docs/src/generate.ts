@@ -96,14 +96,19 @@ function renderMarkdown(
       continue;
     }
 
+    const classDescription = renderDescription(cls.descriptionLines);
+    const documentedFields = cls.fields.filter(
+      (field) => renderDescription(field.descriptionLines).length > 0,
+    );
+    if (classDescription.length === 0 && documentedFields.length === 0) {
+      continue;
+    }
+
     lines.push("");
     lines.push(`## ${cls.name}`);
 
-    const classDescription = renderDescription(cls.descriptionLines);
     if (classDescription.length > 0) {
       lines.push(...classDescription);
-    } else {
-      lines.push("No description.");
     }
 
     lines.push("");
@@ -124,24 +129,21 @@ function renderMarkdown(
     lines.push("");
     lines.push("### API");
 
-    if (cls.fields.length === 0) {
-      lines.push("No properties.");
-    } else {
-      for (const field of cls.fields) {
+    if (documentedFields.length === 0) {
+      continue;
+    }
+    for (const field of documentedFields) {
+      lines.push("");
+      lines.push(`#### ${field.name}`);
+
+      const fieldDescription = renderDescription(field.descriptionLines);
+      if (fieldDescription.length > 0) {
+        lines.push(...fieldDescription);
+      }
+
+      if (field.defaultValue) {
         lines.push("");
-        lines.push(`#### ${field.name}`);
-
-        const fieldDescription = renderDescription(field.descriptionLines);
-        if (fieldDescription.length > 0) {
-          lines.push(...fieldDescription);
-        } else {
-          lines.push("No description.");
-        }
-
-        if (field.defaultValue) {
-          lines.push("");
-          lines.push(`**default**: ${field.defaultValue}`);
-        }
+        lines.push(`**default**: ${field.defaultValue}`);
       }
     }
   }
