@@ -45,7 +45,7 @@ describe("Window", function()
     })
 
     local legend = Window.active_windows[2]
-    local legend_nsid = vim.api.nvim_get_namespaces()["99.window.legend"]
+    local legend_nsid = vim.api.nvim_get_namespaces()["99sync.window.legend"]
     local extmarks = vim.api.nvim_buf_get_extmarks(
       legend.buf_id,
       legend_nsid,

@@ -15,11 +15,11 @@ function M.get_models(provider, callback)
 
   provider.fetch_models(function(models, err)
     if err then
-      vim.notify("99: " .. err, vim.log.levels.ERROR)
+      vim.notify("99sync: " .. err, vim.log.levels.ERROR)
       return
     end
     if not models or #models == 0 then
-      vim.notify("99: No models available", vim.log.levels.WARN)
+      vim.notify("99sync: No models available", vim.log.levels.WARN)
       return
     end
     callback(models, _99sync.get_model())
@@ -56,7 +56,7 @@ end
 --- @param model string
 function M.on_model_selected(model)
   _99sync.set_model(model)
-  vim.notify("99: Model set to " .. model)
+  vim.notify("99sync: Model set to " .. model)
 end
 
 --- @param name string
@@ -65,7 +65,7 @@ function M.on_provider_selected(name, lookup)
   local provider = lookup[name]
   if not provider then
     vim.notify(
-      "99: Invalid provider selection: " .. tostring(name),
+      "99sync: Invalid provider selection: " .. tostring(name),
       vim.log.levels.ERROR
     )
     return

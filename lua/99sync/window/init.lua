@@ -12,8 +12,8 @@ local M = {
   active_windows = {},
 }
 
-local nsid = vim.api.nvim_create_namespace("99.window.error")
-local legend_nsid = vim.api.nvim_create_namespace("99.window.legend")
+local nsid = vim.api.nvim_create_namespace("99sync.window.error")
+local legend_nsid = vim.api.nvim_create_namespace("99sync.window.legend")
 local win_valid = vim.api.nvim_win_is_valid
 local buf_valid = vim.api.nvim_buf_is_valid
 
@@ -297,7 +297,7 @@ local function highlight_rules_found(win, rules, group)
     return
   end
 
-  local rule_nsid = vim.api.nvim_create_namespace("99.window.rules")
+  local rule_nsid = vim.api.nvim_create_namespace("99sync.window.rules")
   local function check_and_highlight_rules()
     if not win_valid(win.win_id) then
       return

@@ -1,5 +1,5 @@
 local Point = require("99sync.geo").Point
-local nsid = vim.api.nvim_create_namespace("99.marks")
+local nsid = vim.api.nvim_create_namespace("99sync.marks")
 
 --- @class _99sync.Mark.Text
 --- @field text string

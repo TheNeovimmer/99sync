@@ -11,7 +11,7 @@ local function get_source(completion)
   local source = completion and completion.source or "native"
 
   if source == "native" then
-    local ok, native = pcall(require, "99.extensions.native")
+    local ok, native = pcall(require, "99sync.extensions.native")
     if not ok then
       vim.notify("[99sync] Failed to load native completions", vim.log.levels.ERROR)
       return
@@ -20,7 +20,7 @@ local function get_source(completion)
   end
 
   if source == "cmp" then
-    local ok, cmp = pcall(require, "99.extensions.cmp")
+    local ok, cmp = pcall(require, "99sync.extensions.cmp")
     if not ok then
       vim.notify(
         '[99sync] nvim-cmp is not installed. Install hrsh7th/nvim-cmp or use source = "blink" or "native"',
@@ -39,7 +39,7 @@ local function get_source(completion)
       )
       return
     end
-    local cmp_ok, cmp = pcall(require, "99.extensions.cmp")
+    local cmp_ok, cmp = pcall(require, "99sync.extensions.cmp")
     if not cmp_ok then
       vim.notify(
         "[99sync] 99sync completion module failed to load",
