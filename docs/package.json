@@ -1,9 +1,0 @@
-{
-  "name": "99sync-docs",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "generate": "node --experimental-strip-types src/generate.ts",
-    "check": "node --experimental-strip-types src/generate.ts --check"
-  }
-}
