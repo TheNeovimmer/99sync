@@ -115,14 +115,14 @@ local _99sync_state
 ---                     ---
 ---                     --- Example:
 ---                     --- Input Path:
----                     --- "scratch/custom_rules/"
+---                     --- "examples/custom_rules/"
 ---                     ---
 ---                     --- Output Rules:
----                     --- {path = "scratch/custom_rules/vim/SKILL.md", name = "vim"},
+---                     --- {path = "examples/custom_rules/vim/SKILL.md", name = "vim"},
 ---                     --- ... the other rules in that dir ...
 ---                     ---
 ---                     custom_rules = {
----                       "scratch/custom_rules/",
+---                       "examples/custom_rules/",
 ---                     },
 ---
 ---                     --- Configure @file completion (all fields optional, sensible defaults)

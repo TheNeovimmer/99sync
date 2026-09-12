@@ -33,10 +33,10 @@ describe("files", function()
       paths[f.path] = f
     end
 
-    assert.is_not_nil(paths["scratch/refresh.lua"])
-    assert.is_not_nil(paths["scratch/test.ts"])
-    eq("refresh.lua", paths["scratch/refresh.lua"].name)
-    eq("test.ts", paths["scratch/test.ts"].name)
+    assert.is_not_nil(paths["examples/refresh.lua"])
+    assert.is_not_nil(paths["examples/test.ts"])
+    eq("refresh.lua", paths["examples/refresh.lua"].name)
+    eq("test.ts", paths["examples/test.ts"].name)
 
     for path, _ in pairs(paths) do
       assert.is_nil(
@@ -61,7 +61,7 @@ describe("files", function()
 
   it("is_project_file by path and name, rejects invalid", function()
     Files.discover_files()
-    eq(true, Files.is_project_file("scratch/refresh.lua"))
+    eq(true, Files.is_project_file("examples/refresh.lua"))
     eq(true, Files.is_project_file("refresh.lua"))
     eq(false, Files.is_project_file("nonexistent/file.lua"))
     eq(false, Files.is_project_file(""))
@@ -86,7 +86,7 @@ describe("files", function()
   end)
 
   it("read_file returns actual file content", function()
-    local content = Files.read_file("scratch/refresh.lua")
+    local content = Files.read_file("examples/refresh.lua")
     assert.is_not_nil(content)
     assert.is_true(#content > 0, "expected non-empty file content")
   end)
@@ -97,25 +97,25 @@ describe("files", function()
 
   it("setup excludes configured patterns and keeps others", function()
     Files.setup(
-      { enabled = true, exclude = { "scratch", ".git", "node_modules" } },
+      { enabled = true, exclude = { "examples", ".git", "node_modules" } },
       {}
     )
     Files.set_project_root(vim.uv.cwd())
     local files = Files.discover_files()
 
-    local has_non_scratch = false
+    local has_non_examples = false
     for _, f in ipairs(files) do
       assert.is_nil(
-        f.path:match("^scratch"),
-        "expected scratch excluded but found: " .. f.path
+        f.path:match("^examples"),
+        "expected examples excluded but found: " .. f.path
       )
-      if not f.path:match("^scratch") then
-        has_non_scratch = true
+      if not f.path:match("^examples") then
+        has_non_examples = true
       end
     end
     assert.is_true(
-      has_non_scratch,
-      "expected non-scratch files to still be present"
+      has_non_examples,
+      "expected non-examples files to still be present"
     )
   end)
 
@@ -142,13 +142,13 @@ describe("files", function()
         refresh_item,
         "expected to find refresh.lua in completion items"
       )
-      eq("@scratch/refresh.lua", refresh_item.insertText)
+      eq("@examples/refresh.lua", refresh_item.insertText)
       assert.is_true(
         refresh_item.filterText:match("refresh%.lua") ~= nil,
         "expected filterText to contain filename"
       )
       eq(17, refresh_item.kind) -- LSP CompletionItemKind.Reference
-      eq("scratch/refresh.lua", refresh_item.detail)
+      eq("examples/refresh.lua", refresh_item.detail)
       eq("markdown", refresh_item.documentation.kind)
     end
   )
@@ -157,7 +157,7 @@ describe("files", function()
     "completion_provider resolve wraps content in code fence with extension",
     function()
       local provider = Files.completion_provider()
-      local content = provider.resolve("scratch/refresh.lua")
+      local content = provider.resolve("examples/refresh.lua")
       assert.is_not_nil(content)
 
       assert.is_true(
@@ -169,7 +169,7 @@ describe("files", function()
         "expected code fence to end with ```"
       )
       assert.is_true(
-        content:match("-- scratch/refresh%.lua") ~= nil,
+        content:match("-- examples/refresh%.lua") ~= nil,
         "expected path comment in fence"
       )
       local inner = content:match("```lua\n.-\n(.+)\n```$")
@@ -192,7 +192,7 @@ describe("files", function()
       "expected code fence to start with ```lua"
     )
     assert.is_true(
-      content:match("-- scratch/refresh%.lua") ~= nil,
+      content:match("-- examples/refresh%.lua") ~= nil,
       "expected full relative path in fence comment"
     )
   end)

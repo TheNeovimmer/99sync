@@ -9,38 +9,38 @@ end
 local custom_mds = {
   {
     name = "back-end",
-    path = "scratch/custom_rules/back-end/SKILL.md",
-    absolute_path = a("scratch/custom_rules/back-end/SKILL.md"),
+    path = "examples/custom_rules/back-end/SKILL.md",
+    absolute_path = a("examples/custom_rules/back-end/SKILL.md"),
   },
   {
     name = "foo",
-    path = "scratch/custom_rules/foo/SKILL.md",
-    absolute_path = a("scratch/custom_rules/foo/SKILL.md"),
+    path = "examples/custom_rules/foo/SKILL.md",
+    absolute_path = a("examples/custom_rules/foo/SKILL.md"),
   },
   {
     name = "front-end",
-    path = "scratch/custom_rules/front-end/SKILL.md",
-    absolute_path = a("scratch/custom_rules/front-end/SKILL.md"),
+    path = "examples/custom_rules/front-end/SKILL.md",
+    absolute_path = a("examples/custom_rules/front-end/SKILL.md"),
   },
   {
     name = "vim.lsp",
-    path = "scratch/custom_rules/vim.lsp/SKILL.md",
-    absolute_path = a("scratch/custom_rules/vim.lsp/SKILL.md"),
+    path = "examples/custom_rules/vim.lsp/SKILL.md",
+    absolute_path = a("examples/custom_rules/vim.lsp/SKILL.md"),
   },
   {
     name = "vim",
-    path = "scratch/custom_rules/vim/SKILL.md",
-    absolute_path = a("scratch/custom_rules/vim/SKILL.md"),
+    path = "examples/custom_rules/vim/SKILL.md",
+    absolute_path = a("examples/custom_rules/vim/SKILL.md"),
   },
   {
     name = "vim",
-    path = "scratch/custom_rules_2/vim/SKILL.md",
-    absolute_path = a("scratch/custom_rules_2/vim/SKILL.md"),
+    path = "examples/custom_rules_2/vim/SKILL.md",
+    absolute_path = a("examples/custom_rules_2/vim/SKILL.md"),
   },
   {
     name = "vim.treesitter",
-    path = "scratch/custom_rules/vim.treesitter/SKILL.md",
-    absolute_path = a("scratch/custom_rules/vim.treesitter/SKILL.md"),
+    path = "examples/custom_rules/vim.treesitter/SKILL.md",
+    absolute_path = a("examples/custom_rules/vim.treesitter/SKILL.md"),
   },
 }
 
@@ -82,8 +82,8 @@ end
 describe("rules: <name>/SKILL.md", function()
   it("rules", function()
     local _99sync = r({
-      "scratch/custom_rules/",
-      "scratch/custom_rules_2/",
+      "examples/custom_rules/",
+      "examples/custom_rules_2/",
     })
     local rules = Agents.rules(_99sync)
     local names = get_names(rules)
@@ -100,8 +100,8 @@ describe("rules: <name>/SKILL.md", function()
 
   it("find rules", function()
     local _99sync = r({
-      "scratch/custom_rules/",
-      "scratch/custom_rules_2/",
+      "examples/custom_rules/",
+      "examples/custom_rules_2/",
     })
     local rules = Agents.rules(_99sync)
     local prompt = "here is a test back-end #front-end and #vim.ls"
@@ -113,20 +113,20 @@ describe("rules: <name>/SKILL.md", function()
 
   it("should validate that tokens exist by path and name", function()
     local _99sync = r({
-      "scratch/custom_rules/",
-      "scratch/custom_rules_2/",
+      "examples/custom_rules/",
+      "examples/custom_rules_2/",
     })
     local rules = Agents.rules(_99sync)
 
     -- Test by path
-    eq(true, Agents.is_rule(rules, "scratch/custom_rules/back-end/SKILL.md"))
-    eq(true, Agents.is_rule(rules, "scratch/custom_rules/foo/SKILL.md"))
-    eq(true, Agents.is_rule(rules, "scratch/custom_rules/front-end/SKILL.md"))
-    eq(true, Agents.is_rule(rules, "scratch/custom_rules/vim.lsp/SKILL.md"))
-    eq(true, Agents.is_rule(rules, "scratch/custom_rules/vim/SKILL.md"))
+    eq(true, Agents.is_rule(rules, "examples/custom_rules/back-end/SKILL.md"))
+    eq(true, Agents.is_rule(rules, "examples/custom_rules/foo/SKILL.md"))
+    eq(true, Agents.is_rule(rules, "examples/custom_rules/front-end/SKILL.md"))
+    eq(true, Agents.is_rule(rules, "examples/custom_rules/vim.lsp/SKILL.md"))
+    eq(true, Agents.is_rule(rules, "examples/custom_rules/vim/SKILL.md"))
     eq(
       true,
-      Agents.is_rule(rules, "scratch/custom_rules/vim.treesitter/SKILL.md")
+      Agents.is_rule(rules, "examples/custom_rules/vim.treesitter/SKILL.md")
     )
 
     -- Test by name

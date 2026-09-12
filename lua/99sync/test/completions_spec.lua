@@ -131,7 +131,7 @@ describe("completions", function()
     local state = {
       rules = Agents.rules({
         completion = {
-          cursor_rules = "scratch/cursor/rules/",
+          cursor_rules = "examples/cursor/rules/",
           custom_rules = {},
         },
       }),
@@ -146,7 +146,7 @@ describe("completions", function()
     eq(2, #triggers)
 
     -- Parse a prompt with a real @file reference
-    local refs = Completions.parse("check @scratch/refresh.lua")
+    local refs = Completions.parse("check @examples/refresh.lua")
     assert.is_true(#refs > 0, "expected at least one resolved reference")
 
     -- Verify resolved content is a real code fence with non-empty body
