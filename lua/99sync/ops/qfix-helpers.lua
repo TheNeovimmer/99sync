@@ -1,0 +1,41 @@
+local M = {}
+
+--- @return _99sync.Search.Result | nil
+function M.parse_line(line)
+  local filepath, lnum_raw, rest = line:match("^(.-):([^:]+):(.+)$")
+  if not filepath or not lnum_raw or not rest then
+    return nil
+  end
+
+  local col_raw, _, notes = rest:match("^([^,]+),([^,]+),?(.*)$")
+  if not col_raw then
+    return nil
+  end
+
+  local lnum = tonumber(lnum_raw) or 1
+  local col = tonumber(col_raw) or 1
+
+  return {
+    filename = filepath,
+    lnum = lnum,
+    col = col,
+    text = notes or "",
+  }
+end
+
+--- @param response string
+--- @return _99sync.Search.Result[]
+function M.create_qfix_entries(response)
+  local lines = vim.split(response, "\n")
+  local qf_list = {} --[[ @as _99sync.Search.Result[] ]]
+
+  for _, line in ipairs(lines) do
+    local res = M.parse_line(line)
+    if res then
+      table.insert(qf_list, res)
+    end
+  end
+  return qf_list
+end
+
+return M
