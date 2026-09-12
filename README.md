@@ -30,7 +30,7 @@ Hand-coding stays the default. AI handles the boring traversal.
 
 - Neovim 0.10+ (`vim.system` API)
 - One or more agent CLIs, depending on provider: `opencode`, `claude`, `cursor-agent`, `kiro-cli`, `gemini`
-- Optional: `telescope.nvim` or `fzf-lua` for pickers, `nvim-cmp` or `blink.cmp` for completion
+- Optional: `snacks.nvim` or `fzf-lua` for pickers, `nvim-cmp` or `blink.cmp` for completion
 - Optional: `plenary.nvim` for running tests
 
 ## Installation
@@ -48,8 +48,8 @@ With [lazy.nvim](https://github.com/folke/lazy.nvim) (lazy-loads on first keypre
     { "<leader>9x", function() require("99sync").stop_all_requests() end, mode = "n", desc = "99sync: Stop requests" },
     { "<leader>9c", function() require("99sync").clear_previous_requests() end, mode = "n", desc = "99sync: Clear requests" },
     { "<leader>9l", function() require("99sync").view_logs() end, mode = "n", desc = "99sync: View logs" },
-    { "<leader>9m", function() require("99sync.extensions.telescope").select_model() end, mode = "n", desc = "99sync: Select model" },
-    { "<leader>9p", function() require("99sync.extensions.telescope").select_provider() end, mode = "n", desc = "99sync: Select provider" },
+    { "<leader>9m", function() require("99sync.extensions.snacks").select_model() end, mode = "n", desc = "99sync: Select model" },
+    { "<leader>9p", function() require("99sync.extensions.snacks").select_provider() end, mode = "n", desc = "99sync: Select provider" },
   },
   dependencies = {
     { "saghen/blink.compat", version = "2.*" }, -- only needed for blink completion
@@ -152,16 +152,18 @@ Notes:
 
 ## Extensions
 
-### Telescope
+### snacks.nvim
 
 ```lua
 vim.keymap.set("n", "<leader>9m", function()
-  require("99sync.extensions.telescope").select_model()
+  require("99sync.extensions.snacks").select_model()
 end)
 vim.keymap.set("n", "<leader>9p", function()
-  require("99sync.extensions.telescope").select_provider()
+  require("99sync.extensions.snacks").select_provider()
 end)
 ```
+
+Uses `Snacks.picker.select` with `vim.ui.select` fallback, so it works even without snacks installed.
 
 ### fzf-lua
 

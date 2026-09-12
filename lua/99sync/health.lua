@@ -60,7 +60,7 @@ function M.check()
   end
 
   local optional = {
-    { mod = "telescope", label = "telescope.nvim (pickers)" },
+    { mod = "snacks", label = "snacks.nvim (pickers)" }
     { mod = "fzf_lua", label = "fzf-lua (pickers)" },
     { mod = "blink.compat", label = "blink.compat (blink source)" },
     { mod = "cmp", label = "nvim-cmp (cmp source)" },

@@ -23,7 +23,7 @@ function M.select_model(provider)
   local ok, fzf = pcall(require, "fzf-lua")
   if not ok then
     vim.notify(
-      "99: fzf-lua is required for this extension",
+      "99sync: fzf-lua is required for this extension",
       vim.log.levels.ERROR
     )
     return
@@ -31,7 +31,7 @@ function M.select_model(provider)
 
   pickers_util.get_models(provider, function(models, current)
     fzf.fzf_exec(promote_current(models, current), {
-      prompt = "99: Select Model (current: " .. current .. ")> ",
+      prompt = "99sync: Select Model (current: " .. current .. ")> ",
       actions = {
         ["enter"] = function(selected)
           if not selected or #selected == 0 then
@@ -48,7 +48,7 @@ function M.select_provider()
   local ok, fzf = pcall(require, "fzf-lua")
   if not ok then
     vim.notify(
-      "99: fzf-lua is required for this extension",
+      "99sync: fzf-lua is required for this extension",
       vim.log.levels.ERROR
     )
     return
@@ -57,7 +57,7 @@ function M.select_provider()
   local info = pickers_util.get_providers()
 
   fzf.fzf_exec(promote_current(info.names, info.current), {
-    prompt = "99: Select Provider (current: " .. info.current .. ")> ",
+    prompt = "99sync: Select Provider (current: " .. info.current .. ")> ",
     actions = {
       ["enter"] = function(selected)
         if not selected or #selected == 0 then
