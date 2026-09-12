@@ -35,39 +35,57 @@ Hand-coding stays the default. AI handles the boring traversal.
 
 ## Installation
 
-With [lazy.nvim](https://github.com/folke/lazy.nvim):
+With [lazy.nvim](https://github.com/folke/lazy.nvim) (lazy-loads on first keypress):
 
 ```lua
 {
   "TheNeovimmer/99sync",
+  keys = {
+    { "<leader>9s", function() require("99sync").search() end, mode = "n", desc = "99sync: Search codebase" },
+    { "<leader>9v", function() require("99sync").visual() end, mode = "v", desc = "99sync: Work on selection" },
+    { "<leader>9b", function() require("99sync").vibe() end, mode = "n", desc = "99sync: Vibe" },
+    { "<leader>9o", function() require("99sync").open() end, mode = "n", desc = "99sync: Open last request" },
+    { "<leader>9x", function() require("99sync").stop_all_requests() end, mode = "n", desc = "99sync: Stop requests" },
+    { "<leader>9c", function() require("99sync").clear_previous_requests() end, mode = "n", desc = "99sync: Clear requests" },
+    { "<leader>9l", function() require("99sync").view_logs() end, mode = "n", desc = "99sync: View logs" },
+    { "<leader>9m", function() require("99sync.extensions.telescope").select_model() end, mode = "n", desc = "99sync: Select model" },
+    { "<leader>9p", function() require("99sync.extensions.telescope").select_provider() end, mode = "n", desc = "99sync: Select provider" },
+  },
+  dependencies = {
+    { "saghen/blink.compat", version = "2.*" }, -- only needed for blink completion
+  },
   config = function()
     local _99sync = require("99sync")
-    local basename = vim.fs.basename(vim.uv.cwd())
     _99sync.setup({
-      -- provider = _99sync.Providers.ClaudeCodeProvider, -- default: OpenCodeProvider
-      logger = {
-        level = _99sync.DEBUG,
-        path = "/tmp/" .. basename .. ".99sync.debug",
-        print_on_error = true,
-      },
-      -- Must stay inside cwd or opencode/claude permission wrappers will block writes.
-      tmp_dir = "./tmp",
-      completion = {
-        custom_rules = { "scratch/custom_rules/" },
-        files = {}, -- optional: enabled, max_file_size, max_files, exclude
-        source = "native", -- "native" (default), "cmp", or "blink"
-      },
+      provider = _99sync.Providers.OpenCodeProvider, -- default; switch live with <leader>9p
+      tmp_dir = "./tmp", -- keep inside cwd to avoid CLI permission blocks
       md_files = { "AGENT.md" },
+      completion = {
+        source = "blink", -- "native" (zero-dep), "cmp", or "blink"
+        custom_rules = {},
+        files = {
+          enabled = true,
+          max_file_size = 102400,
+          max_files = 5000,
+          exclude = { ".git", ".env", ".env.*", "node_modules", "dist", "build", "target", ".next", ".turbo", "coverage", "vendor" },
+        },
+      },
+      display_errors = true,
+      auto_add_skills = true,
+      logger = {
+        level = _99sync.INFO,
+        type = "file",
+        path = vim.fn.stdpath("state") .. "/99sync.log",
+        print_on_error = true,
+        max_requests_cached = 20,
+      },
+      in_flight_options = { enable = true },
     })
-
-    vim.keymap.set("v", "<leader>9v", function() _99sync.visual() end)
-    vim.keymap.set("n", "<leader>9x", function() _99sync.stop_all_requests() end)
-    vim.keymap.set("n", "<leader>9s", function() _99sync.search() end)
-    vim.keymap.set("n", "<leader>9b", function() _99sync.vibe() end)
-    vim.keymap.set("n", "<leader>9o", function() _99sync.open() end)
   end,
 }
 ```
+
+Prefer zero dependencies? Set `completion.source = "native"` and drop `dependencies`.
 
 ## Quickstart
 
@@ -76,7 +94,8 @@ With [lazy.nvim](https://github.com/folke/lazy.nvim):
 3. `<leader>9s` -> type your question -> quickfix list fills with locations + notes -> `:copen` to review.
 4. `<leader>9b` (`vibe`) when you want edits applied, then review the diff.
 5. `v` + `<leader>9v` to replace only the visual selection.
-6. `<leader>9x` cancels all in-flight requests.
+6. `<leader>9x` cancels all in-flight requests, `<leader>9c` clears history.
+7. `<leader>9l` views logs, `<leader>9m` / `<leader>9p` switch model / provider live.
 
 Programmatic, no prompt window:
 
