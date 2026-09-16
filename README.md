@@ -1,136 +1,150 @@
 # 99sync
 
-Agentic AI workflow for Neovim. Search, vibe-code, and edit visually without leaving your editor.
+Agentic AI workflow for Neovim. Search, vibe-code, and edit visually — without leaving your editor.
 
-Maintained by [TheNeovimmer](https://github.com/TheNeovimmer). Repo: `TheNeovimmer/99sync`.
+> Hand-coding stays the default. AI handles the boring traversal.
+
+Maintained by [TheNeovimmer](https://github.com/TheNeovimmer). `TheNeovimmer/99sync`. MIT. Beta.
 
 ## Why 99sync
 
-99sync melds traditional coding ("tradcoding") with LLMs. Instead of replacing you, it augments you:
+Most AI plugins replace your workflow. 99sync augments it:
 
-- `search` first: ask a question about your codebase, get back quickfix locations with notes.
-- `vibe` when you want the agent to make the edits.
-- `visual` when you want to replace exactly what you selected.
-- `Worker` to keep one unit of work pinned while you search what is left.
+- `search` first — ask about your codebase, get a quickfix list of locations + notes.
+- `vibe` when you want the agent to make the edits, then you review the diff.
+- `visual` when you want to replace exactly what you selected, nothing more.
+- `Worker` to pin one unit of work while you `search` what is left.
 
-Hand-coding stays the default. AI handles the boring traversal.
+No API keys in the plugin. 99sync shells out to the CLI you already authenticated (`opencode`, `claude`, `cursor-agent`, `kiro-cli`, `gemini`).
 
-## Features
+## How it works
 
-- Project-wide `search` -> quickfix list with notes
-- `vibe` sessions that apply edits you can review
-- `visual` selection replace
-- Persistent `Worker` (`set_work` + `search` what is left)
-- `#rule` and `@file` completions in the prompt buffer (native, cmp, or blink)
-- Multiple CLI backends: OpenCode (default), Claude Code, Cursor Agent, Kiro, Gemini CLI
-- Telescope / fzf-lua pickers to switch model and provider live
-- Request tracking, cancel-all, and per-request debug logs
+| Operation | You do | You get |
+|---|---|---|
+| `search` | Ask a question | Quickfix locations + notes, jumpable with `:copen` |
+| `vibe` | Describe the change | Edits applied in place, review with `git diff` |
+| `visual` | Select code + prompt | Selection replaced with the result |
+| `open` | Revisit history | Re-open quickfix for any prior `search` / `vibe` |
+
+In-flight requests show a spinner. `stop_all_requests()` kills the CLI process and discards the result. `clear_previous_requests()` clears history.
 
 ## Requirements
 
 - Neovim 0.10+ (`vim.system` API)
-- One or more agent CLIs, depending on provider: `opencode`, `claude`, `cursor-agent`, `kiro-cli`, `gemini`
-- Optional: `snacks.nvim` or `fzf-lua` for pickers, `nvim-cmp` or `blink.cmp` for completion
+- One backend CLI for the provider you use: `opencode` (default), `claude`, `cursor-agent`, `kiro-cli`, or `gemini`
+- Optional: `snacks.nvim` or `fzf-lua` for model/provider pickers (falls back to `vim.ui.select`)
+- Optional: `nvim-cmp` or `blink.cmp` for `#` / `@` completion (zero-dep `native` built in)
 - Optional: `plenary.nvim` for running tests
 
 ## Installation
 
-With [lazy.nvim](https://github.com/folke/lazy.nvim) (lazy-loads on first keypress):
+Minimal (`native` completion, zero extra deps):
 
 ```lua
 {
   "TheNeovimmer/99sync",
   keys = {
     { "<leader>9s", function() require("99sync").search() end, mode = "n", desc = "99sync: Search codebase" },
-    { "<leader>9v", function() require("99sync").visual() end, mode = "v", desc = "99sync: Work on selection" },
-    { "<leader>9b", function() require("99sync").vibe() end, mode = "n", desc = "99sync: Vibe" },
-    { "<leader>9o", function() require("99sync").open() end, mode = "n", desc = "99sync: Open last request" },
-    { "<leader>9x", function() require("99sync").stop_all_requests() end, mode = "n", desc = "99sync: Stop requests" },
+    { "<leader>9b", function() require("99sync").vibe() end,   mode = "n", desc = "99sync: Vibe" },
+    { "<leader>9v", function() require("99sync").visual() end,  mode = "v", desc = "99sync: Work on selection" },
+    { "<leader>9o", function() require("99sync").open() end,    mode = "n", desc = "99sync: Open last request" },
+    { "<leader>9x", function() require("99sync").stop_all_requests() end,     mode = "n", desc = "99sync: Stop requests" },
     { "<leader>9c", function() require("99sync").clear_previous_requests() end, mode = "n", desc = "99sync: Clear requests" },
-    { "<leader>9l", function() require("99sync").view_logs() end, mode = "n", desc = "99sync: View logs" },
-    { "<leader>9m", function() require("99sync.extensions.snacks").select_model() end, mode = "n", desc = "99sync: Select model" },
-    { "<leader>9p", function() require("99sync.extensions.snacks").select_provider() end, mode = "n", desc = "99sync: Select provider" },
-  },
-  dependencies = {
-    { "saghen/blink.compat", version = "2.*" }, -- only needed for blink completion
   },
   config = function()
-    local _99sync = require("99sync")
-    _99sync.setup({
-      provider = _99sync.Providers.OpenCodeProvider, -- default; switch live with <leader>9p
-      tmp_dir = "./tmp", -- keep inside cwd to avoid CLI permission blocks
-      md_files = { "AGENT.md" },
-      completion = {
-        source = "blink", -- "native" (zero-dep), "cmp", or "blink"
-        custom_rules = {},
-        files = {
-          enabled = true,
-          max_file_size = 102400,
-          max_files = 5000,
-          exclude = { ".git", ".env", ".env.*", "node_modules", "dist", "build", "target", ".next", ".turbo", "coverage", "vendor" },
-        },
-      },
-      display_errors = true,
-      auto_add_skills = true,
-      logger = {
-        level = _99sync.INFO,
-        type = "file",
-        path = vim.fn.stdpath("state") .. "/99sync.log",
-        print_on_error = true,
-        max_requests_cached = 20,
-      },
-      in_flight_options = { enable = true },
-    })
+    require("99sync").setup({ tmp_dir = "./tmp" })
   end,
 }
 ```
 
-Prefer zero dependencies? Set `completion.source = "native"` and drop `dependencies`.
+> `tmp_dir` must stay inside the cwd — `opencode` / Claude refuse external dirs by default (see [opencode permissions](https://opencode.ai/docs/permissions/#external-directories)).
+
+<details>
+<summary>Full config with defaults</summary>
+
+```lua
+require("99sync").setup({
+  provider = require("99sync").Providers.OpenCodeProvider, -- default; switch live with select_provider()
+  -- model = "opencode/big-pickle", -- omit to use provider default (self-heals to first available)
+  -- provider_extra_args = { "--no-session-persistence" }, -- appended to every provider command
+  tmp_dir = "./tmp", -- keep inside cwd
+  md_files = { "AGENT.md" }, -- auto-attached by walking up from the request file
+  display_errors = true,
+  auto_add_skills = true,
+  completion = {
+    source = "native", -- "native" | "cmp" | "blink"
+    custom_rules = {}, -- dirs of <name>/SKILL.md for `#` completion
+    files = {
+      enabled = true,
+      max_file_size = 102400,
+      max_files = 5000,
+      exclude = { ".git", ".env", ".env.*", "node_modules", "dist", "build", "target", ".next", ".turbo", "coverage", "vendor" },
+    },
+  },
+  logger = {
+    level = require("99sync").INFO, -- DEBUG for bug reports
+    type = "file",
+    path = vim.fn.stdpath("state") .. "/99sync.log",
+    print_on_error = true,
+    max_requests_cached = 20,
+  },
+  in_flight_options = { enable = true }, -- spinner for active requests
+})
+```
+
+For `blink.cmp` add `{ "saghen/blink.compat", version = "2.*" }` to `dependencies` and set `source = "blink"`.
+
+</details>
 
 ## Quickstart
 
-1. Install a backend, e.g. `opencode` and authenticate it.
-2. Open a project, select code (for `visual`) or not (for `search`/`vibe`).
-3. `<leader>9s` -> type your question -> quickfix list fills with locations + notes -> `:copen` to review.
-4. `<leader>9b` (`vibe`) when you want edits applied, then review the diff.
-5. `v` + `<leader>9v` to replace only the visual selection.
-6. `<leader>9x` cancels all in-flight requests, `<leader>9c` clears history.
-7. `<leader>9l` views logs, `<leader>9m` / `<leader>9p` switch model / provider live.
+1. Install + authenticate a backend, e.g. `opencode`.
+2. `<leader>9s` → type a question → `:copen` to walk the quickfix results.
+3. `<leader>9b` when you want edits applied, then `git diff` to review.
+4. `v` + `<leader>9v` to replace only the visual selection.
+5. `<leader>9x` cancels everything in flight. `<leader>9m` / `<leader>9p` switch model / provider live.
 
-Programmatic, no prompt window:
+Skip the prompt window programmatically:
 
 ```lua
-_99sync.search({ additional_prompt = "run `make test` and explain failures" })
-_99sync.vibe({ additional_prompt = "fix the failing tests" })
+require("99sync").search({ additional_prompt = "run `make test` and explain failures" })
+require("99sync").vibe({ additional_prompt = "fix the failing tests" })
 ```
 
 ## Worker: one thing at a time
 
+Pin the work item, then repeatedly search what is left:
+
 ```lua
 local Worker = require("99sync").Extensions.Worker
 Worker.set_work({ description = "migrate auth to sessions" })
-Worker.search() -- finds what is left for current work
+Worker.search() -- what is left for current work (diff + commits + tests aware)
+Worker.vibe()   -- implement the next slice
 ```
 
-## Status
-
-Beta. The prompt flow and request lifecycle are stable; prompt text and minor APIs may still change. Pin a commit if you need reproducibility.
-
+`Worker.update_work()` re-opens the prompt to edit the item.
 
 ## Completions
 
 In the prompt buffer:
 
 - `#` completes rule/skill files from `completion.custom_rules` (each `<dir>/<name>/SKILL.md`).
-- `@` fuzzy-finds project files (`git ls-files` in git repos, filesystem scan otherwise) and injects content.
+- `@` fuzzy-finds project files (`git ls-files` in repos, filesystem scan otherwise) and injects content.
 
-Works out of the box with `source = "native"`. For `nvim-cmp` set `source = "cmp"`, for `blink.cmp` set `source = "blink"`.
+Works with `source = "native"`. Set `"cmp"` or `"blink"` for your completion framework.
 
 ## Providers
 
-99sync shells out to AI CLIs. Set `provider` in `setup`. If `model` is unset, the provider default below is used (current as of Sep 2026).
+Set once in `setup`, or switch live (resets model to the new provider default for the session):
 
-| Provider | CLI tool | Default model |
+```lua
+vim.keymap.set("n", "<leader>9m", function() require("99sync.extensions.snacks").select_model() end)
+vim.keymap.set("n", "<leader>9p", function() require("99sync.extensions.snacks").select_provider() end)
+-- fzf-lua variant: require("99sync.extensions.fzf_lua").select_model() / .select_provider()
+-- both fall back to vim.ui.select when the picker plugin is absent
+```
+
+| Provider | CLI | Default model (Sep 2026) |
 |---|---|---|
 | `OpenCodeProvider` (default) | `opencode` | `opencode/big-pickle` |
 | `ClaudeCodeProvider` | `claude` | `claude-fable-5-1` |
@@ -139,53 +153,37 @@ Works out of the box with `source = "native"`. For `nvim-cmp` set `source = "cmp
 | `GeminiCLIProvider` | `gemini` | `gemini-3.8-flash` |
 
 ```lua
-_99sync.setup({
-  provider = _99sync.Providers.ClaudeCodeProvider,
+require("99sync").setup({
+  provider = require("99sync").Providers.ClaudeCodeProvider,
   model = "claude-fable-5-1", -- optional override
 })
 ```
 
 Notes:
 
-- OpenCode `fetch_models` shells `opencode models`; Cursor shells `cursor-agent models`. Claude Code has no list endpoint, so its picker uses a curated Sep 2026 list (`claude-fable-5-1`, `claude-mythos-5-1`).
-- `provider_extra_args = { "--no-session-persistence" }` in `setup` appends raw flags to every provider command.
+- `opencode` lists via `opencode models`, Cursor via `cursor-agent models`. Claude Code has no list endpoint, so its picker uses a curated list (`claude-fable-5-1`, `claude-mythos-5-1`).
+- If the configured default model is missing, `setup()` falls back to the first listed model and notifies you.
 
-## Extensions
+## API
 
-### snacks.nvim
+| Function | Purpose |
+|---|---|
+| `setup(opts?)` | Must be called once |
+| `search(opts?)` / `vibe(opts?)` / `visual(opts?)` | Prompt (or pass `{ additional_prompt }` to skip it) |
+| `open()` | Pick a prior `search` / `vibe` and reopen its quickfix |
+| `view_logs()` | Pick a request and inspect per-request debug logs |
+| `stop_all_requests()` / `clear_previous_requests()` | Cancel in-flight / clear history |
+| `get_model()` / `set_model(m)` / `get_provider()` / `set_provider(p)` | Read/override model + backend |
 
-```lua
-vim.keymap.set("n", "<leader>9m", function()
-  require("99sync.extensions.snacks").select_model()
-end)
-vim.keymap.set("n", "<leader>9p", function()
-  require("99sync.extensions.snacks").select_provider()
-end)
-```
+## Troubleshooting
 
-Uses `Snacks.picker.select` with `vim.ui.select` fallback, so it works even without snacks installed.
+1. `:checkhealth 99sync` — fixes missing CLI, bad model, unwritable `tmp_dir`.
+2. Repro with `logger.level = require("99sync").DEBUG`, then `:lua require("99sync").view_logs()` and open the failing request.
+3. File an issue at `TheNeovimmer/99sync` with: what you ran, expected vs actual, backend version (`opencode --version`, …), model, and redacted logs (strip secrets).
 
-### fzf-lua
+## Status
 
-```lua
-vim.keymap.set("n", "<leader>9m", function()
-  require("99sync.extensions.fzf_lua").select_model()
-end)
-vim.keymap.set("n", "<leader>9p", function()
-  require("99sync.extensions.fzf_lua").select_provider()
-end)
-```
-
-Switching provider resets the model to that provider default for the session.
-
-## Troubleshooting and bug reports
-
-1. Run `:checkhealth 99sync` and fix anything it flags (missing CLI, bad model, unwritable `tmp_dir`).
-2. Repro with debug logging on (`logger.level = _99sync.DEBUG`).
-3. Run `:lua require("99sync").view_logs()`, pick the failing request.
-4. Open an issue at `TheNeovimmer/99sync` with: what you ran, expected vs actual, backend (`opencode --version` etc.), model, and redacted logs (strip secrets/`query` if needed).
-
-`stop_all_requests()` kills the underlying CLI process; the result is discarded. `clear_previous_requests()` clears history.
+Beta. Request lifecycle and prompt flow are stable; prompt text and minor APIs may still change. Pin a commit for reproducibility. Roadmap lives in [TODO.md](./TODO.md).
 
 ## License
 
